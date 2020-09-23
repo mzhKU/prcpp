@@ -90,7 +90,7 @@ public class Matrix {
             return new Matrix(this.nRows, this.nCols, resultMatrix.values);
         }
         else {
-            // What if i<0? Assumption: return current matrix.
+            // What if i<0?
             throw new IllegalArgumentException("Exponent not allowed negative.");
         }
     }
