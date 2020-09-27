@@ -22,9 +22,15 @@ public class Matrix {
     static { System.loadLibrary("MatrixMultiplication"); }
 
     native void multiplyC(double[] a, double[] b, double[] r, int m, int n, int o);
-    native void powerC(double[] vs, double[] m, int r, int c, int k);
+    native void powerC(double[] vs, double[] m, int r, int k);
 
+    // Test functions
+    native void iterateArrayC(double[] toIterate);
 
+    private void iterateArrayCCaller() {
+        double tmp[] = new double[]{4.0, 1.0, 5.0};
+        iterateArrayC(tmp);
+    }
 
 
 
@@ -119,23 +125,11 @@ public class Matrix {
             return this;
         }
         if (i>1) {
-            /*
-            Matrix m = new Matrix(this.nRows, this.nCols, this.values);
-            Matrix resultMatrix = new Matrix(this.nRows, this.nCols, 0.0);
-            for (int k = 1; k < i; k++) {
-                resultMatrix = new Matrix(this.nRows, this.nCols, 0.0);
-                this.multiplyC(m.values, this.values, resultMatrix.values, this.nRows, this.nCols, resultMatrix.nCols);
-                this.values = resultMatrix.values;
-                // Arrays.stream(this.values).forEach(v -> System.out.println(v));
-            }
-            */
-            double[] originalValues = new double[this.values.length];
-            for(int k=0; k<originalValues.length; k++) {
-                originalValues[k] = this.values[k];
-            }
-            this.powerC(this.values, originalValues, this.nRows, this.nCols, i);
+            double[] resultValues = new double[this.values.length];
 
-            return new Matrix(this.nRows, this.nCols, this.values);
+            this.powerC(this.values, resultValues, this.nRows, i);
+
+            return new Matrix(this.nRows, this.nCols, resultValues);
         } else {
             // What if i<0? Assumption: return current matrix.
             return this;
@@ -220,11 +214,16 @@ public class Matrix {
 
 
     public static void main(String[] args) {
+        /*
         Matrix A = new Matrix(2, 3, new double[]{2, 3, 5, 1, 2, 3});
         Matrix B = new Matrix(3, 2, new double[]{2, 3, 4, 6, 1, 1});
         // Matrix result = A.multiply(B);
         // Matrix resultShouldBe = new Matrix(2, 2, new double[]{21, 29, 13, 18});
         // System.out.println(A.equals(A));
         A.powerCpp(5);
+        */
+
+        Matrix A = new Matrix(2, 3, new double[]{2, 3, 5, 1, 2, 3});
+        A.iterateArrayCCaller();
     }
 }

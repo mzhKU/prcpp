@@ -82,9 +82,9 @@ class MatrixTest {
         Matrix A = new Matrix(2, 3, new double[]{2, 3, 5, 1, 2, 3});
         Matrix B = new Matrix(3, 2, new double[]{2, 3, 4, 6, 1, 1});
         Matrix result = A.multiplyCpp(B);
-        // Arrays.stream(result.getValues()).forEach((v) -> System.out.println(v));
+        Arrays.stream(result.getValues()).forEach((v) -> System.out.println(v));
         Matrix resultShouldBe = new Matrix(2, 2, new double[]{21, 29, 13, 18});
-        // Arrays.stream(resultShouldBe.getValues()).forEach((v) -> System.out.println(v));
+        Arrays.stream(resultShouldBe.getValues()).forEach((v) -> System.out.println(v));
         assertTrue(result.equals(resultShouldBe));
     }
 
@@ -114,9 +114,10 @@ class MatrixTest {
 
     @Test
     void testM250Power93() {
-        int POW = 2;
+        int POW = 3;
         int SIZE = 2;
-        Matrix A1 = new Matrix(SIZE, SIZE, new double[]{6, 2, 3, 4});
+        Matrix A1 = new Matrix(SIZE, SIZE, new double[]{1, 2, 3, 4});
+
 
         /*
         Reference values:
@@ -134,12 +135,14 @@ class MatrixTest {
         long finCpp = System.currentTimeMillis();
 
         // System.out.println("Java: " + (finJava - initJava) + " Milliseconds");
-        System.out.println("C++:  " + (finCpp - initCpp)   + " Milliseconds");
-        System.out.println();
+        // System.out.println("C++:  " + (finCpp - initCpp)   + " Milliseconds");
+        // System.out.println();
 
+
+        Arrays.stream(resultJava.getValues()).forEach(v -> System.out.println(v));
         Arrays.stream(resultCpp.getValues()).forEach(v -> System.out.println(v));
 
-        // assertEquals(resultJava, resultCpp);
+        assertEquals(resultJava, resultCpp);
     }
 
     @Test
