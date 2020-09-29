@@ -26,7 +26,6 @@ public class Matrix {
 
     // Test functions
     native void iterateArrayC(double[] toIterate);
-
     private void iterateArrayCCaller() {
         double tmp[] = new double[]{4.0, 1.0, 5.0};
         iterateArrayC(tmp);
@@ -63,7 +62,6 @@ public class Matrix {
 
 
 
-
     /* -------------------------------------------------------- */
     /* ------------ MULTIPLICATION JAVA ----------------------- */
     /* -------------------------------------------------------- */
@@ -81,26 +79,43 @@ public class Matrix {
     }
 
     public Matrix power(int i) throws IllegalArgumentException {
-        if (i == 0) {
-            // Power 0 returns unit matrix.
-            return new Matrix(this.nRows, this.nCols, setUnitMatrix(this));
-        }
-        if (i == 1) {
-            return this;
-        }
+        if (i == 0) { return new Matrix(this.nRows, this.nCols, setUnitMatrix(this)); }
+        if (i == 1) { return this; }
         if (i>1) {
-            Matrix resultMatrix = new Matrix(this.nRows, this.nCols, this.values);
+            Matrix originalMatrix = new Matrix(this.nRows, this.nCols, new double[this.values.length]);
+            for(int s=0; s<this.values.length; s++) { originalMatrix.values[s] = this.values[s]; }
+
+            Matrix tmp = new Matrix(this.nRows, this.nCols, new double[this.values.length]);
+            for(int s=0; s<this.values.length; s++) { tmp.values[s] = this.values[s]; }
+
+            // Starts with k=1 because for POWER=2 only one multiplication is done.
             for (int k=1; k < i; k++) {
-                this.multiply(this, resultMatrix);
+                multiplyInPlace(this, originalMatrix, tmp);
+
+                // Swap primitives.
+                for (int l=0; l<this.values.length; l++) { this.values[l] = tmp.values[l]; }
             }
-            return new Matrix(this.nRows, this.nCols, resultMatrix.values);
+            return new Matrix(this.nRows, this.nCols, this.values);
         }
         else {
             // What if i<0?
             throw new IllegalArgumentException("Exponent not allowed negative.");
         }
     }
+
+    private void multiplyInPlace(Matrix a, Matrix b, Matrix accumulated) {
+        for (int r=0; r<a.nRows; r++) {
+            for (int c=0; c<b.nCols; c++) {
+                double cell = 0.0;
+                for (int k=0; k<a.nCols; k++) {
+                     cell += a.values[r*nCols+k] * b.values[k*b.nCols+c];
+                }
+                accumulated.values[r*accumulated.nCols+c] = cell;
+            }
+        }
+    }
     /* -------------------------------------------------------- */
+
 
 
     /* -------------------------------------------------------- */
@@ -139,29 +154,6 @@ public class Matrix {
 
 
 
-
-    /* -------------------------------------------------------- */
-    /* ------------ CACHE ------------------------------------- */
-    /* -------------------------------------------------------- */
-    // Prevent repeated allocation of array on heap.
-    private void multiply(Matrix m, Matrix r) {
-        r.values = r.multiply(m).values;
-    }
-    /* -------------------------------------------------------- */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /* -------------------------------------------------------- */
     /* ------------ UTILITIES  -------------------------------- */
     /* -------------------------------------------------------- */
@@ -181,10 +173,10 @@ public class Matrix {
         }
         return tmp;
     }
+    private void printArrayOf(Matrix m) {
+        Arrays.stream(m.getValues()).forEach(v -> System.out.println(v));
+    }
     /* -------------------------------------------------------- */
-
-
-
 
 
 
@@ -222,7 +214,6 @@ public class Matrix {
         // System.out.println(A.equals(A));
         A.powerCpp(5);
         */
-
         Matrix A = new Matrix(2, 3, new double[]{2, 3, 5, 1, 2, 3});
         A.iterateArrayCCaller();
     }

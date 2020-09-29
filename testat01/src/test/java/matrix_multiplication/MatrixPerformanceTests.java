@@ -71,26 +71,46 @@ class MatrixPerformanceTests {
 
     @Test
     void testM250Power93() {
-        int POW = 20;
-        int SIZE = 2;
-        // Matrix A1 = new Matrix(SIZE, SIZE, new double[]{1, 2, 3, 4});
+        int POW = 93; int SIZE = 250;
+        // Matrix A1 = new Matrix(SIZE, SIZE, new double[]{1, 2, 3, 4.0, 5, 6, 7, 8, 9});
         Matrix A1 = new Matrix(SIZE, SIZE);
+
+        // Make sure both matrices have the same values.
+        double a2Values[] = new double[SIZE*SIZE];
+        for(int i=0; i<a2Values.length; i++) { a2Values[i] = A1.getValues()[i]; }
+        Matrix A2 = new Matrix(SIZE, SIZE, a2Values);
 
         long initJava = System.currentTimeMillis();
         Matrix resultJava = A1.power(POW);
         long finJava  = System.currentTimeMillis();
 
         long initCpp = System.currentTimeMillis();
-        Matrix resultCpp = A1.powerCpp(POW);
+        Matrix resultCpp = A2.powerCpp(POW);
         long finCpp = System.currentTimeMillis();
 
-        // System.out.println("Java: " + (finJava - initJava) + " Milliseconds");
-        // System.out.println("C++:  " + (finCpp - initCpp)   + " Milliseconds");
-        // System.out.println();
+        System.out.println("Java: " + (finJava - initJava) + " Milliseconds");
+        System.out.println("C++:  " + (finCpp - initCpp)   + " Milliseconds");
+        System.out.println();
 
-        Arrays.stream(resultJava.getValues()).forEach(v -> System.out.println(v));
-        Arrays.stream(resultCpp.getValues()).forEach(v -> System.out.println(v));
+        // printArrayOf(A1); printArrayOf(A2);
+
+        /*
+         * Performance metrics for Release version DLL
+         * (VM options "-Djava.library.path="D:\00_fhnw\repo_prcpp\vs_projekte\testat01\PRCPP\x64\Debug")
+         * - Java:  xx seconds
+         * - C++:   xx seconds
+         *
+         * Performance metrics for Debug version DLL
+         * (VM options "-Djava.library.path="D:\00_fhnw\repo_prcpp\vs_projekte\testat01\PRCPP\x64\Release")
+         * - Java: 2828 Milliseconds
+         * - C++:  1873 Milliseconds
+         *
+         */
 
         assertEquals(resultJava, resultCpp);
+    }
+
+    private void printArrayOf(Matrix m) {
+        Arrays.stream(m.getValues()).forEach(v -> System.out.println(v));
     }
 }
