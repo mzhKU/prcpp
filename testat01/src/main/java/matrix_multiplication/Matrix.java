@@ -67,15 +67,9 @@ public class Matrix {
     /* -------------------------------------------------------- */
     // m[i][j] = values[i*m + j]
     public Matrix multiply(Matrix m) {
-        double[] resultValues = new double[this.nRows*m.nCols];
-        for (int r=0; r<nRows; r++) {
-            for (int c=0; c<m.nCols; c++) {
-                for (int k=0; k<m.nRows; k++) {
-                    resultValues[r*m.nCols+c] += values[r*nCols+k]*m.values[k*m.nCols+c];
-                }
-            }
-        }
-        return new Matrix(this.nRows, m.nCols, resultValues);
+        Matrix result = new Matrix(this.nRows, m.nCols, new double[this.nRows*m.nCols]);
+        multiplyInPlace(this, m, result);
+        return result;
     }
 
     public Matrix power(int i) throws IllegalArgumentException {
@@ -86,14 +80,17 @@ public class Matrix {
             for(int s=0; s<this.values.length; s++) { originalMatrix.values[s] = this.values[s]; }
 
             Matrix tmp = new Matrix(this.nRows, this.nCols, new double[this.values.length]);
-            for(int s=0; s<this.values.length; s++) { tmp.values[s] = this.values[s]; }
+
+            double swapPointer[];
 
             // Starts with k=1 because for POWER=2 only one multiplication is done.
             for (int k=1; k < i; k++) {
                 multiplyInPlace(this, originalMatrix, tmp);
 
-                // Swap primitives.
-                for (int l=0; l<this.values.length; l++) { this.values[l] = tmp.values[l]; }
+                // Swap primitives
+                swapPointer = this.values;
+                this.values = tmp.values;
+                tmp.values  = swapPointer;
             }
             return new Matrix(this.nRows, this.nCols, this.values);
         }
@@ -105,12 +102,17 @@ public class Matrix {
 
     private void multiplyInPlace(Matrix a, Matrix b, Matrix accumulated) {
         for (int r=0; r<a.nRows; r++) {
+
+            // Reuse in loops.
+            int skipRowMatrixA=r*a.nCols;
+            int skipRowMatrixB=r*accumulated.nCols;
+
             for (int c=0; c<b.nCols; c++) {
                 double cell = 0.0;
                 for (int k=0; k<a.nCols; k++) {
-                     cell += a.values[r*nCols+k] * b.values[k*b.nCols+c];
+                    cell += a.values[skipRowMatrixA+k]*b.values[k*b.nCols+c];
                 }
-                accumulated.values[r*accumulated.nCols+c] = cell;
+                accumulated.values[skipRowMatrixB+c] = cell;
             }
         }
     }
@@ -124,9 +126,6 @@ public class Matrix {
     public Matrix multiplyCpp(Matrix m) {
         // m: Rows, n: Cols
         double[] resultValues = new double[this.nRows*m.nCols];
-        for (int i=0; i<resultValues.length; i++) {
-            resultValues[i] = 0.0;
-        }
         this.multiplyC(this.values, m.values, resultValues, this.nRows, this.nCols, m.nCols);
         return new Matrix(this.nRows, m.nCols, resultValues);
     }
@@ -162,14 +161,11 @@ public class Matrix {
     }
     private double[] setUnitMatrix(Matrix m) {
         double[] tmp = new double[m.values.length];
-        for (int r=0; r<this.nRows; r++) {
-            for (int c=0; c<this.nCols; c++) {
-                if(r==c) {
-                    tmp[r*this.nCols+c] = 1.0;
-                } else {
-                    tmp[r*this.nCols+c] = 0.0;
-                }
-            }
+        int indexOnRowToSetToOne = 0;
+        for (int i=0; i<m.nRows; i++) {
+            tmp[indexOnRowToSetToOne] = 1;
+            // Move index over all columns + 1 for the next diagonal.
+            indexOnRowToSetToOne = indexOnRowToSetToOne+m.nCols+1;
         }
         return tmp;
     }

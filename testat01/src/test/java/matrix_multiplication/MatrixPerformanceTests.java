@@ -59,21 +59,25 @@ class MatrixPerformanceTests {
         /*
          * Performance metrics for Debug version DLL
          * (VM options "-Djava.library.path="D:\00_fhnw\repo_prcpp\vs_projekte\testat01\PRCPP\x64\Debug")
-         * - Java:  6880 milliseconds
-         * - C++:  15986 milliseconds
+         * - Java:  6274 milliseconds
+         * - C++:   9960 milliseconds
          *
          * Performance metrics for Release version DLL
          * (VM options "-Djava.library.path="D:\00_fhnw\repo_prcpp\vs_projekte\testat01\PRCPP\x64\Release")
-         * - Java: 6488 seconds
-         * - C++:  5947 seconds
+         * - Java: 6221 seconds
+         * - C++:  5890 seconds
          */
     }
 
+
+
     @Test
     void testM250Power93() {
-        int POW = 93; int SIZE = 250;
-        // Matrix A1 = new Matrix(SIZE, SIZE, new double[]{1, 2, 3, 4.0, 5, 6, 7, 8, 9});
+        int POW = 93;
+        int SIZE = 250;
+        // Matrix A1 = new Matrix(SIZE, SIZE, new double[] { 1.0, 2.0, 3.0, 4.0 });
         Matrix A1 = new Matrix(SIZE, SIZE);
+
 
         // Make sure both matrices have the same values.
         double a2Values[] = new double[SIZE*SIZE];
@@ -88,26 +92,29 @@ class MatrixPerformanceTests {
         Matrix resultCpp = A2.powerCpp(POW);
         long finCpp = System.currentTimeMillis();
 
+
         System.out.println("Java: " + (finJava - initJava) + " Milliseconds");
         System.out.println("C++:  " + (finCpp - initCpp)   + " Milliseconds");
         System.out.println();
 
-        // printArrayOf(A1); printArrayOf(A2);
+
+        // System.out.println("Result Matrices:");
+        // printArrayOf(resultJava);  System.out.println(); printArrayOf(resultCpp);
 
         /*
          * Performance metrics for Release version DLL
          * (VM options "-Djava.library.path="D:\00_fhnw\repo_prcpp\vs_projekte\testat01\PRCPP\x64\Debug")
-         * - Java:  xx seconds
-         * - C++:   xx seconds
+         * - Java:  3184 Milliseconds
+         * - C++:   5746 Milliseconds
          *
          * Performance metrics for Debug version DLL
          * (VM options "-Djava.library.path="D:\00_fhnw\repo_prcpp\vs_projekte\testat01\PRCPP\x64\Release")
-         * - Java: 2828 Milliseconds
-         * - C++:  1873 Milliseconds
+         * - Java: 3196 Milliseconds
+         * - C++:  2040 Milliseconds
          *
          */
 
-        assertEquals(resultJava, resultCpp);
+         assertTrue(resultJava.equals(resultCpp));
     }
 
     private void printArrayOf(Matrix m) {
